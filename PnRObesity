@@ -1,0 +1,72 @@
+rm(list=ls())
+
+setwd("C:/Users/Dawson/Desktop/Stats")
+
+data<-read.csv("data-constricted.csv")
+data_rural<-read.csv("data-constricted-rural.csv")
+data_metro<-read.csv("data-constricted-metro.csv")
+
+
+install.packages("lmtest")
+library(lmtest)
+
+install.packages("MASS")
+install.packages("car")
+library(MASS)
+library(car)
+
+##################################
+## Mod 1 rural + Metro          ##
+##################################
+mod1<-lm(Percent_Obese_Adults~County_Status+ Parks_spending_per + Food_Environment_Index+ Percent_Exercise_Opportunities+ Percent_Some_College+ Median_Income+ Percent_white, data=data)
+summary(mod1)
+
+
+
+##################################
+## Mod 2 rural                  ##
+##################################
+mod2<-lm(Percent_Obese_Adults~Parks_spending_per + Food_Environment_Index+ Percent_Exercise_Opportunities+ Percent_Some_College+ Median_Income+ Percent_white, data=data_rural)
+summary(mod2)
+
+##################################
+## Mod 3 metro                  ##
+##################################
+mod3<-lm(Percent_Obese_Adults~Parks_spending_per + Food_Environment_Index+ Percent_Exercise_Opportunities+ Percent_Some_College+ Median_Income+ Percent_white, data=data_metro)
+summary(mod3)
+
+
+mylogit <- glm(Percent_Obese_Adults~Parks_spending_per + Food_Environment_Index+ Percent_Exercise_Opportunities+ Percent_Some_College+ Median_Income+ Percent_white, data=data_rural)
+summary(mylogit)
+
+install.packages("stargazer")
+library(stargazer)
+
+stargazer(mylogit,
+          digits=2,
+          title="Logistic Regression",
+          type = "html",
+          out="Table-rural.doc")
+
+
+###Summary Stats for each individual variable###
+
+## X has a positive or negative effect on y it is signicaicant, specificaly a one unit increse in X leads to a beta increase in y then maybe a more susbtansial example ##
+
+##################
+## BP Test ##
+##################
+bptest(mod1)
+
+
+##################
+## Collinearity ##
+##################
+
+vif(mod1)
+
+sd(data$Parks_spending_per)
+[1] 0.08257708
+> -9.929605*0.08257708
+[1] -0.8199578
+> A standard deviation increase in parks and rec spending leads to a .81 percentage point decrease the obesity rate
